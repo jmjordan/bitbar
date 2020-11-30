@@ -81,7 +81,8 @@
     [item setTarget:self];
   }
   BOOL parseANSI = [fullTitle containsANSICodes] && ![[params[@"ansi"] lowercaseString] isEqualToString:@"false"];
-  if (params[@"font"] || params[@"size"] || params[@"color"] || parseANSI)
+  BOOL hasLineBreak = [fullTitle containsString:@"<br>"];
+  if (params[@"font"] || params[@"size"] || params[@"color"] || parseANSI || hasLineBreak)
     item.attributedTitle = [self attributedTitleWithParams:params];
   
   if (params[@"alternate"]) {
@@ -106,6 +107,8 @@
   if (![[params[@"trim"] lowercaseString] isEqualToString:@"false"]) {
     fullTitle = [fullTitle stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceCharacterSet];
   }
+  
+  fullTitle = [fullTitle stringByReplacingOccurrencesOfString:@"<br>" withString:@"\n"];
 
   CGFloat titleLength = [fullTitle length];
   CGFloat lengthParam = params[@"length"] ? [params[@"length"] floatValue] : titleLength;
@@ -125,7 +128,7 @@
                                        ?: [NSFont menuFontOfSize:size];
   }
 
-  NSDictionary* attributes = @{NSFontAttributeName: font, NSBaselineOffsetAttributeName : @0};
+  NSDictionary* attributes = @{NSFontAttributeName: font, NSBaselineOffsetAttributeName : @-4};
   BOOL parseANSI = [fullTitle containsANSICodes] && ![[params[@"ansi"] lowercaseString] isEqualToString:@"false"];
   if (parseANSI) {
     NSMutableAttributedString * attributedTitle = [title attributedStringParsingANSICodes];
